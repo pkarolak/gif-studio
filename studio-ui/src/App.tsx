@@ -246,9 +246,12 @@ export function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <span className="logo" aria-hidden>
-            ▶
-          </span>
+          <svg className="logo" viewBox="0 0 20 20" width="20" height="20" aria-hidden>
+            <rect width="9" height="9" rx="2.5" fill="#F24822" />
+            <rect x="11" width="9" height="9" rx="4.5" fill="#9747FF" />
+            <rect y="11" width="9" height="9" rx="4.5" fill="#0D99FF" />
+            <rect x="11" y="11" width="9" height="9" rx="2.5" fill="#14AE5C" />
+          </svg>
           gif-studio
         </div>
         <label className="field">
@@ -320,6 +323,7 @@ export function App() {
           <section className="viewer">
             <Player
               src={sceneUrl(asset, viewedVersion)}
+              label={`${asset} / ${viewing === WORKING ? 'working copy' : viewing}`}
               reloadKey={reloadKey}
               onReady={handleReady}
               onStageClick={(point) => {
@@ -355,7 +359,11 @@ export function App() {
             </Player>
             <div className="transport">
               <button type="button" className="icon" aria-label={playing ? 'Pause' : 'Play'} onClick={() => setPlaying((p) => !p)} disabled={!manifest}>
-                {playing ? '❚❚' : '▶'}
+                {playing ? (
+                  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden><rect x="3" y="2" width="3.5" height="12" fill="currentColor" /><rect x="9.5" y="2" width="3.5" height="12" fill="currentColor" /></svg>
+                ) : (
+                  <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden><path d="M3 1.5v13L14 8z" fill="currentColor" /></svg>
+                )}
               </button>
               <button type="button" className="icon" aria-label="Previous frame" onClick={() => step(-1, false)} disabled={!manifest}>
                 ‹

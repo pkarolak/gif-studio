@@ -14,10 +14,11 @@ interface PlayerProps {
   reloadKey: number;
   onReady(control: SceneControl, manifest: Manifest): void;
   onStageClick(point: {x: number; y: number}): void;
+  label?: string;
   children?: ReactNode;
 }
 
-export function Player({src, reloadKey, onReady, onStageClick, children}: PlayerProps) {
+export function Player({src, reloadKey, onReady, onStageClick, label, children}: PlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [size, setSize] = useState({width: 960, height: 540});
@@ -31,7 +32,7 @@ export function Player({src, reloadKey, onReady, onStageClick, children}: Player
     const container = containerRef.current;
     if (!container) return;
     const update = () => {
-      const pad = 48;
+      const pad = 80;
       const w = container.clientWidth - pad;
       const h = container.clientHeight - pad;
       setScale(Math.max(0.1, Math.min(w / size.width, h / size.height, 2)));
@@ -116,6 +117,14 @@ export function Player({src, reloadKey, onReady, onStageClick, children}: Player
   return (
     <div className="player" ref={containerRef}>
       <div className="stage" style={{width: size.width * scale, height: size.height * scale}}>
+        {label && (
+          <span className="frame-label">
+            {label}
+            <span>
+              {size.width} × {size.height}
+            </span>
+          </span>
+        )}
         <iframe
           key={`${src}#${reloadKey}`}
           ref={iframeRef}
