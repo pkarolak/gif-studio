@@ -5,6 +5,7 @@ import {NoteComposer, NotesPanel, type NumberedNote} from './Notes';
 import {PacingPanel} from './Pacing';
 import {Player, type SceneControl} from './Player';
 import {Scrubber} from './Scrubber';
+import {Select} from './Select';
 import {VersionsPanel} from './Versions';
 
 const WORKING = 'working';
@@ -180,7 +181,7 @@ export function App() {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
-      if (target.closest('input, textarea, select, [contenteditable]')) return;
+      if (target.closest('input, textarea, select, [contenteditable], [data-select]')) return;
       if (event.key === ' ') {
         event.preventDefault();
         setDraft(null);
@@ -255,29 +256,25 @@ export function App() {
           <span className="brand-name">Gif Studio</span>
           <span className="pro">PRO</span>
         </div>
-        <label className="field">
-          <span>Asset</span>
-          <select value={asset ?? ''} onChange={(e) => setAsset(e.target.value)} disabled={!project?.assets.length}>
-            {project?.assets.map((a) => (
-              <option key={a.asset} value={a.asset}>
-                {a.asset}
-                {a.openNotes ? ` · ${a.openNotes} open` : ''}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field">
-          <span>Version</span>
-          <select value={viewing} onChange={(e) => setViewing(e.target.value)}>
-            <option value={WORKING}>Working copy</option>
-            {[...versions].reverse().map((v) => (
-              <option key={v.label} value={v.label}>
-                {v.label}
-                {v.archived ? ' (archived)' : ''}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="field">
+          <span aria-hidden>Asset</span>
+          <Select<string>
+            label="Asset"
+            value={asset ?? ''}
+            onChange={setAsset}
+            disabled={!project?.assets.length}
+            options={(project?.assets ?? []).map((a) => ({value: a.asset, label: a.asset, meta: a.openNotes ? `${a.openNotes} open` : undefined, tone: 'open' as const}))}
+          />
+        </div>
+        <div className="field">
+          <span aria-hidden>Version</span>
+          <Select<string>
+            label="Version"
+            value={viewing}
+            onChange={setViewing}
+            options={[{value: WORKING, label: 'Working copy'}, ...[...versions].reverse().map((v) => ({value: v.label, label: v.label, meta: v.archived ? 'archived' : undefined}))]}
+          />
+        </div>
         {assetInfo?.final && <span className="badge done">Shipped to final/</span>}
         <div className="spacer" />
         <div className="export">
@@ -391,13 +388,15 @@ export function App() {
                   onSelectNote={seekToNote}
                 />
               )}
-              <select className="rate" value={rate} onChange={(e) => setRate(Number(e.target.value))} aria-label="Playback speed">
-                {RATES.map((r) => (
-                  <option key={r} value={r}>
-                    {r}x
-                  </option>
-                ))}
-              </select>
+              <Select<number>
+                className="rate"
+                label="Playback speed"
+                value={rate}
+                onChange={setRate}
+                placement="up"
+                align="end"
+                options={RATES.map((r) => ({value: r, label: `${r}x`}))}
+              />
             </div>
             <div className="hints muted">Space play/pause · ←/→ one frame (Shift ×10) · click the frame to leave a note</div>
           </section>
