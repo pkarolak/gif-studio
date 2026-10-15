@@ -437,30 +437,59 @@ select:hover:not(:disabled) {
 }
 
 .pin.draft {
-  position: static;
+  position: relative;
+  transform: none;
   background: var(--brand);
+  animation: pin-pop 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pin.draft::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 22px 22px 22px 6px;
+  border: 2px solid var(--brand);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .pin-draft {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
+  transform: translate(0, -100%);
   cursor: default;
 }
 
 .composer-anchor {
   position: absolute;
-  left: 44px;
-  top: -44px;
+  left: calc(100% + 14px);
+  top: -10px;
 }
 
 .composer-anchor.left {
   left: auto;
-  right: 8px;
+  right: calc(100% + 14px);
 }
 
 .composer-anchor.up {
   top: auto;
-  bottom: 44px;
+  bottom: -10px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pin.draft::after {
+    animation: pin-ping 1.6s ease-out infinite;
+  }
+}
+
+@keyframes pin-pop {
+  from { scale: 0.4; }
+  to { scale: 1; }
+}
+
+@keyframes pin-ping {
+  0% { opacity: 0.7; scale: 0.85; }
+  100% { opacity: 0; scale: 1.25; }
 }
 
 .composer {
