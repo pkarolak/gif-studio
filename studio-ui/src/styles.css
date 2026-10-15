@@ -28,6 +28,7 @@
   --pad-inset: 8px;
   --r-inset: calc(var(--r-card) - var(--pad-inset));
   --control-h: 40px;
+  --inset: var(--pad-card);
 
   color-scheme: light;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -782,7 +783,10 @@ select:hover:not(:disabled) {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding-right: 8px;
+}
+
+.panel-toolbar > .muted {
+  padding-right: var(--inset);
 }
 
 .segmented {
@@ -810,8 +814,12 @@ select:hover:not(:disabled) {
 }
 
 .empty {
-  padding: 8px;
+  padding: 8px var(--inset);
   color: var(--text);
+}
+
+.panel.empty {
+  padding: 8px calc(var(--pad-panel) + var(--inset)) calc(var(--pad-panel) + var(--inset));
 }
 
 .empty p {
@@ -963,7 +971,7 @@ select:hover:not(:disabled) {
 }
 
 .pacing-list li {
-  padding: 14px 8px 16px;
+  padding: 14px var(--inset) 16px;
 }
 
 .pacing-list li + li {
@@ -979,7 +987,7 @@ select:hover:not(:disabled) {
 }
 
 .pacing-total {
-  padding-left: 8px;
+  padding-left: var(--inset);
 }
 
 .pacing-total strong {
@@ -1073,7 +1081,7 @@ select:hover:not(:disabled) {
 
 .hint {
   margin: 0;
-  padding: 4px 8px;
+  padding: 4px var(--inset);
   font-size: 12px;
 }
 
