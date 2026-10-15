@@ -108,6 +108,44 @@ button:disabled {
   letter-spacing: -0.01em;
 }
 
+.brand-name {
+  white-space: nowrap;
+}
+
+.pro {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  margin-left: -2px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #5b4bff, #ff4fa3);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .logo-back {
+    animation: trail-back 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  .logo-mid {
+    animation: trail-mid 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+}
+
+@keyframes trail-back {
+  0%, 100% { transform: translate(0, 0); opacity: 1; }
+  50% { transform: translate(4px, -2.5px); opacity: 0.6; }
+}
+
+@keyframes trail-mid {
+  0%, 100% { transform: translate(0, 0); opacity: 1; }
+  50% { transform: translate(2px, -1.2px); opacity: 0.85; }
+}
+
 .field {
   display: flex;
   align-items: center;

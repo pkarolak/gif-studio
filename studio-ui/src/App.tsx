@@ -231,7 +231,7 @@ export function App() {
   if (projectError) {
     return (
       <div className="fatal">
-        <h1>Can't reach gif-studio</h1>
+        <h1>Can't reach Gif Studio</h1>
         <p>{projectError}</p>
         <p className="muted">Start it from your project with: npx gif-studio studio</p>
       </div>
@@ -246,13 +246,14 @@ export function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-          <svg className="logo" viewBox="0 0 20 20" width="20" height="20" aria-hidden>
-            <rect width="9" height="9" rx="2.5" fill="#F24822" />
-            <rect x="11" width="9" height="9" rx="4.5" fill="#9747FF" />
-            <rect y="11" width="9" height="9" rx="4.5" fill="#0D99FF" />
-            <rect x="11" y="11" width="9" height="9" rx="2.5" fill="#14AE5C" />
+          <svg className="logo" viewBox="0 0 28 24" width="28" height="24" aria-hidden>
+            <rect className="logo-back" x="0" y="7" width="16" height="16" rx="5" fill="#FFC21A" />
+            <rect className="logo-mid" x="5" y="4" width="16" height="16" rx="5" fill="#FF4FA3" />
+            <rect x="10" y="1" width="16" height="16" rx="5" fill="#5B4BFF" />
+            <path d="M16 5.8v6.4l5.2-3.2z" fill="#fff" />
           </svg>
-          gif-studio
+          <span className="brand-name">Gif Studio</span>
+          <span className="pro">PRO</span>
         </div>
         <label className="field">
           <span>Asset</span>
