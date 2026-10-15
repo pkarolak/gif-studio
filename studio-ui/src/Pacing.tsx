@@ -1,5 +1,10 @@
 import {buildPacing, pacedDuration} from '../../src/shared/pacing';
+import type {CSSProperties} from 'react';
 import {formatTime, type Manifest} from './api';
+
+const MIN_SPEED = 0.25;
+const MAX_SPEED = 3;
+const ONE_X = ((1 - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)) * 100;
 
 interface PacingPanelProps {
   manifest: Manifest;
@@ -24,7 +29,7 @@ export function PacingPanel({manifest, speeds, onChange}: PacingPanelProps) {
   return (
     <div className="panel">
       <div className="panel-toolbar">
-        <span>
+        <span className="pacing-total">
           Total <strong>{formatTime(total)}</strong>
           {changed && <span className="muted"> (was {formatTime(manifest.duration)})</span>}
         </span>
@@ -36,32 +41,34 @@ export function PacingPanel({manifest, speeds, onChange}: PacingPanelProps) {
         {manifest.sections.map((section) => {
           const speed = speeds[section.id] ?? 1;
           const length = section.end - section.start;
+          const fill = ((speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED)) * 100;
           return (
-            <li key={section.id}>
+            <li key={section.id} className={speed !== 1 ? 'paced' : undefined}>
               <div className="pacing-head">
                 <span>{section.label}</span>
-                <span className="muted">
-                  {formatTime(length / speed)} · {speed.toFixed(2)}x
+                <span className="pacing-value">
+                  <span className="muted">{formatTime(length / speed)}</span>
+                  <button type="button" className="speed" disabled={speed === 1} title="Reset to 1x" onClick={() => onChange({...speeds, [section.id]: 1})}>
+                    {speed.toFixed(2)}x
+                  </button>
                 </span>
               </div>
               <input
                 type="range"
-                min={0.25}
-                max={3}
+                min={MIN_SPEED}
+                max={MAX_SPEED}
                 step={0.05}
                 value={speed}
+                style={{'--from': `${Math.min(fill, ONE_X)}%`, '--to': `${Math.max(fill, ONE_X)}%`, '--one': `${ONE_X}%`} as CSSProperties}
                 aria-label={`${section.label} speed`}
+                aria-valuetext={`${speed.toFixed(2)} times speed`}
                 onChange={(e) => onChange({...speeds, [section.id]: Number(e.target.value)})}
               />
-              <div className="pacing-scale muted">
-                <span>Slower</span>
-                <span>Faster</span>
-              </div>
             </li>
           );
         })}
       </ul>
-      <p className="muted hint">Pacing is saved to pacing.json and applied by the next export. Your agent can bake it into the scene timings.</p>
+      <p className="muted hint">Drag left to slow a section down, right to speed it up. Pacing is saved to pacing.json and applied by the next export. Your agent can bake it into the scene timings.</p>
     </div>
   );
 }
