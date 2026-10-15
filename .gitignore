@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+.gif-studio/
+*.log
+.DS_Store
+test/.tmp/
+examples/**/marketing/gifs/*/versions/
+examples/**/marketing/gifs/*/final/
+examples/**/marketing/gifs/*/archive/

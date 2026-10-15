@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>{{TITLE}}</title>
+<!--
+  Synthetic scene: rebuild the product UI in HTML/CSS with the repo's real tokens, icons and copy.
+  Rules: everything visible is driven by the timeline (scene.tween / scene.type / cursor / camera),
+  never by setTimeout or CSS transitions, so seek(t) renders the exact frame for any t.
+  Add scene.section(...) for every part you want on the Pacing tab and scene.beat(...) for key moments.
+-->
+<style>
+  :root { --primary: {{PRIMARY}}; --accent: {{ACCENT}}; --font: {{FONT}}; --ink: #14161f; }
+  #stage { font-family: var(--font); color: var(--ink);
+    background-color: #f7f8fb; background-image: radial-gradient(rgba(20, 30, 80, .14) 1px, transparent 1px); background-size: 22px 22px; }
+  .card { position: absolute; padding: 18px 20px; border-radius: 14px; background: #fff; width: 280px;
+    box-shadow: 0 18px 40px -22px rgba(20, 30, 80, .45), 0 0 0 1px rgba(20, 30, 80, .08); }
+  .card h3 { margin: 0 0 8px; font-size: 18px; }
+  .field { height: 38px; border-radius: 10px; border: 1px solid rgba(20, 30, 80, .16); padding: 0 12px; display: flex; align-items: center; font-size: 15px; }
+  .button { margin-top: 12px; height: 38px; border-radius: 10px; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 650; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script type="module">
+  import {createScene} from '/__studio/runtime.js';
+
+  const W = {{WIDTH}}, H = {{HEIGHT}};
+  const scene = createScene({width: W, height: H});
+
+  const card = scene.el('div', {className: 'card', html: '<h3>{{TITLE}}</h3><div class="field"></div><div class="button">Create</div>', style: {left: `${W / 2 - 160}px`, top: `${H / 2 - 90}px`}});
+  const field = card.querySelector('.field');
+  const button = card.querySelector('.button');
+  const cursor = scene.cursor({name: 'Alex', color: '{{PRIMARY}}'});
+
+  scene.fadeIn(card, 0, 500, {y: 20});
+  scene.section('intro', 'Card appears', 0, 700);
+
+  let t = cursor.moveTo(700, 800, {x: W / 2 - 40, y: H / 2 - 18});
+  t = cursor.click(t);
+  t = scene.type(field, {at: t + 100, text: 'Q3 launch plan'});
+  scene.beat(t, 'Typed');
+  scene.section('type', 'Typing', 700, t);
+
+  const clickAt = cursor.moveTo(t + 200, 600, {x: W / 2 - 20, y: H / 2 + 40});
+  cursor.click(clickAt);
+  scene.tween(button, {at: clickAt, dur: 120, to: {scale: 0.96}});
+  scene.tween(button, {at: clickAt + 120, dur: 200, to: {scale: 1}, ease: 'outBack'});
+  scene.beat(clickAt, 'Create');
+  scene.section('create', 'Create', t, clickAt + 600);
+
+  scene.tween(card, {at: clickAt + 700, dur: 500, to: {scale: 1.06}, ease: 'outBack'});
+  scene.section('outro', 'Outro', clickAt + 600, clickAt + 2200);
+  scene.done({duration: clickAt + 2200});
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{
+  "name": "gif-studio",
+  "version": "0.1.0",
+  "description": "AI-first studio for turning any repo, app or folder into animated GIF and MP4 marketing assets. Ships a CLI, a local MCP server and an agent skill.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Patryk Karolak",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pkarolak/gif-studio.git"
+  },
+  "homepage": "https://github.com/pkarolak/gif-studio#readme",
+  "bugs": {
+    "url": "https://github.com/pkarolak/gif-studio/issues"
+  },
+  "keywords": [
+    "gif",
+    "mp4",
+    "marketing",
+    "animation",
+    "mcp",
+    "ai-agent",
+    "playwright",
+    "screen-recording"
+  ],
+  "bin": {
+    "gif-studio": "dist/cli/index.js"
+  },
+  "exports": {
+    ".": "./dist/core/index.js",
+    "./runtime": "./dist/runtime/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "skill",
+    "AGENTS.md",
+    "llms.txt"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "npm run build:lib && npm run build:studio",
+    "build:lib": "tsc -p tsconfig.json && node scripts/postbuild.mjs",
+    "build:studio": "vite build --config studio-ui/vite.config.ts",
+    "dev:studio": "vite --config studio-ui/vite.config.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p studio-ui/tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:integration": "GIF_STUDIO_INTEGRATION=1 vitest run test/integration",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "chokidar": "^5.0.0",
+    "commander": "^15.0.0",
+    "playwright-core": "^1.64.1",
+    "ws": "^8.22.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/ws": "^8.18.2",
+    "@vitejs/plugin-react": "^6.1.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
+  }
+}

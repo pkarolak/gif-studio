@@ -1,0 +1,25 @@
+# gif-studio
+
+> AI-first studio that turns any repo, running app, folder of images or brief into looping GIF, MP4 and still
+> marketing assets. Agents drive it through a CLI (`npx gif-studio … --json`) or a local stdio MCP server
+> (`npx gif-studio mcp`); humans review in a browser studio with scrubbing, pinned notes, versions and pacing.
+
+Start with `npx gif-studio guide` (the full agent playbook) and `npx gif-studio status --json`.
+
+## Docs
+
+- [Agent playbook](AGENTS.md): the loop (scan → explore → journeys → record → new → preview → render → studio →
+  apply notes → promote), scene contract, runtime API, journey format, quality bar
+- [README](README.md): install, quick start, commands, MCP setup, configuration
+- [Agent skill](skill/SKILL.md): short procedure installed into `.cursor/skills`, `.claude/skills`, `.agents/skills`
+
+## Key facts
+
+- Every CLI command accepts `--json` and returns `{ok, data, summary, next}`; errors return `{ok: false, error, hint}`.
+- MCP tools mirror CLI commands: guide, status, init, templates, scan, app_start/stop/status, auth_login,
+  browser_open/click/type/press/hover/scroll/screenshot/snapshot, explore, journeys_list/save, record, asset_new,
+  media_add, scene_preview, render, studio_start, notes, note_done, pacing, promote.
+- Scene contract: `window.__scene = {contract: 1, width, height, duration, sections, beats, seek(t), ready}`;
+  scenes are pure functions of time.
+- Output layout: `marketing/gifs/<asset>/{brief.md, scene.html, versions/, final/, archive/}`, captures in
+  `marketing/gifs/captures/<journey>/`.

@@ -1,0 +1,38 @@
+:root {
+  --brand: #6c4cf5;
+  --brand-ink: #2a1a7a;
+  --accent: #ffb020;
+  --ink: #161827;
+  --muted: #6b7088;
+  --line: #e6e8f0;
+  --bg: #f6f7fb;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); }
+header { display: flex; align-items: center; gap: 24px; height: 60px; padding: 0 28px; background: #fff; border-bottom: 1px solid var(--line); }
+header .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 18px; }
+header nav { display: flex; gap: 18px; }
+header nav a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 14px; }
+header nav a.active { color: var(--ink); }
+main { padding: 32px 28px; max-width: 1100px; }
+h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: -0.02em; }
+.lede { color: var(--muted); margin: 0 0 24px; }
+.toolbar { display: flex; gap: 12px; margin-bottom: 20px; }
+button, .btn { font: inherit; font-weight: 650; border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; }
+.primary { background: var(--brand); color: #fff; }
+.ghost { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.card { background: #fff; border-radius: 14px; padding: 18px; box-shadow: 0 1px 0 var(--line), 0 10px 24px -18px rgba(30, 20, 90, .35); }
+.card h3 { margin: 0 0 6px; font-size: 16px; }
+.card p { margin: 0; color: var(--muted); font-size: 13px; }
+.pill { display: inline-block; margin-top: 12px; padding: 3px 9px; border-radius: 99px; background: #efeaff; color: var(--brand-ink); font-size: 12px; font-weight: 700; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(22, 24, 39, .35); display: none; align-items: center; justify-content: center; }
+.modal-backdrop.open { display: flex; }
+.modal { width: 420px; background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 30px 60px -20px rgba(20, 10, 80, .45); }
+.modal h2 { margin: 0 0 16px; font-size: 20px; }
+label { display: block; font-size: 13px; font-weight: 650; margin-bottom: 6px; }
+input { width: 100%; font: inherit; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line); margin-bottom: 18px; }
+.actions { display: flex; justify-content: flex-end; gap: 10px; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; font-weight: 600; display: none; }
+.toast.show { display: block; }

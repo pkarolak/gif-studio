@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>{{TITLE}}</title>
+<style>
+  :root { --primary: {{PRIMARY}}; --accent: {{ACCENT}}; --font: {{FONT}}; --ink: #14161f; }
+  #stage { font-family: var(--font); color: var(--ink); background: #f4f6fb; }
+  .headline { position: absolute; left: 0; right: 0; text-align: center; font-weight: 750; letter-spacing: -0.02em; }
+  .frame { position: absolute; border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -30px rgba(20, 30, 80, .5); }
+  .frame > .layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+  .placeholder { display: grid; place-items: center; color: #fff; font-weight: 700; }
+  .tag { position: absolute; top: 14px; padding: .3em .8em; border-radius: 99px; font-weight: 700; color: #fff; background: rgba(20, 22, 31, .8); }
+  .divider { position: absolute; top: 0; bottom: 0; width: 3px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, .1), 0 0 18px rgba(0, 0, 0, .25); }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script type="application/json" id="scene-data">
+{
+  "headline": "{{TITLE}}",
+  "before": "",
+  "after": "",
+  "beforeLabel": "Before",
+  "afterLabel": "After",
+  "media": {{MEDIA}}
+}
+</script>
+<script type="module">
+  import {createScene} from '/__studio/runtime.js';
+
+  const data = JSON.parse(document.getElementById('scene-data').textContent);
+  const W = {{WIDTH}}, H = {{HEIGHT}};
+  const scene = createScene({width: W, height: H});
+  const unit = Math.min(W, H);
+  const images = data.media.filter((m) => /\.(png|jpe?g|webp|gif|svg)$/i.test(m) && !/logo|favicon|mark/i.test(m));
+  const before = data.before || images[0];
+  const after = data.after || images[1];
+  const headlineHeight = data.headline ? H * 0.16 : 0;
+  const pad = unit * 0.06;
+
+  if (data.headline) {
+    const headline = scene.el('div', {className: 'headline', text: data.headline, style: {top: `${pad * 0.8}px`, fontSize: `${Math.round(unit * 0.06)}px`}});
+  }
+  const frame = scene.el('div', {className: 'frame', style: {left: `${pad}px`, top: `${headlineHeight + pad * 0.5}px`, width: `${W - pad * 2}px`, height: `${H - headlineHeight - pad * 1.5}px`}});
+  const layer = (src, label, color) => {
+    const node = src ? scene.el('img', {parent: frame, className: 'layer'}) : scene.el('div', {parent: frame, className: 'layer placeholder', text: label, style: {background: color, fontSize: `${unit * 0.08}px`}});
+    if (src) node.src = src;
+    return node;
+  };
+  layer(before, data.beforeLabel, '#8790a8');
+  const afterLayer = layer(after, data.afterLabel, 'var(--primary)');
+  const divider = scene.el('div', {parent: frame, className: 'divider'});
+  const beforeTag = scene.el('div', {parent: frame, className: 'tag', text: data.beforeLabel, style: {left: '14px', fontSize: `${Math.round(unit * 0.03)}px`}});
+  const afterTag = scene.el('div', {parent: frame, className: 'tag', text: data.afterLabel, style: {right: '14px', background: 'var(--primary)', fontSize: `${Math.round(unit * 0.03)}px`}});
+  const width = W - pad * 2;
+
+  scene.set(afterLayer, 0, {clip: 0});
+  scene.set(divider, 0, {x: 0, opacity: 0});
+  scene.set(afterTag, 0, {opacity: 0});
+  scene.section('before', data.beforeLabel, 0, 1600);
+  scene.beat(900, data.beforeLabel);
+
+  scene.set(divider, 1600, {opacity: 1});
+  scene.tween(afterLayer, {at: 1600, dur: 1500, from: {clip: 0}, to: {clip: 100}, ease: 'inOut'});
+  scene.tween(divider, {at: 1600, dur: 1500, from: {x: 0}, to: {x: width}, ease: 'inOut'});
+  scene.tween(beforeTag, {at: 2600, dur: 300, to: {opacity: 0}});
+  scene.tween(afterTag, {at: 2800, dur: 300, from: {opacity: 0}, to: {opacity: 1}});
+  scene.set(divider, 3100, {opacity: 0});
+  scene.section('reveal', 'Reveal', 1600, 3100);
+  scene.beat(3400, data.afterLabel);
+  scene.section('after', data.afterLabel, 3100, 5200);
+
+  scene.set(divider, 5200, {opacity: 1});
+  scene.tween(afterLayer, {at: 5200, dur: 900, from: {clip: 100}, to: {clip: 0}, ease: 'inOut'});
+  scene.tween(divider, {at: 5200, dur: 900, from: {x: width}, to: {x: 0}, ease: 'inOut'});
+  scene.tween(afterTag, {at: 5200, dur: 250, to: {opacity: 0}});
+  scene.tween(beforeTag, {at: 5800, dur: 300, to: {opacity: 1}});
+  scene.set(divider, 6100, {opacity: 0});
+  scene.section('reset', 'Reset', 5200, 6400);
+  scene.done({duration: 6400});
+</script>
+</body>
+</html>

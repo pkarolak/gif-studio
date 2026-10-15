@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Plannr — Projects</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<header>
+  <div class="logo"><img src="/logo.svg" alt="" width="28" height="28" />Plannr</div>
+  <nav>
+    <a href="/" data-route="/">Projects</a>
+    <a href="/team" data-route="/team">Team</a>
+  </nav>
+</header>
+<main id="view"></main>
+<div class="modal-backdrop" id="modal">
+  <form class="modal" id="new-project">
+    <h2>New project</h2>
+    <label for="project-name">Project name</label>
+    <input id="project-name" placeholder="e.g. Website relaunch" autocomplete="off" />
+    <div class="actions">
+      <button type="button" class="ghost" id="cancel">Cancel</button>
+      <button type="submit" class="primary">Create project</button>
+    </div>
+  </form>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  const projects = [
+    {name: 'Mobile app v2', tasks: 18, status: 'In progress'},
+    {name: 'Brand refresh', tasks: 9, status: 'Review'},
+    {name: 'Customer portal', tasks: 24, status: 'Planning'},
+  ];
+  const view = document.getElementById('view');
+  const modal = document.getElementById('modal');
+
+  function render() {
+    const route = location.pathname;
+    document.querySelectorAll('nav a').forEach((a) => a.classList.toggle('active', a.dataset.route === route));
+    if (route === '/team') {
+      document.title = 'Plannr — Team';
+      view.innerHTML = `<h1>Team</h1><p class="lede">Everyone working on your projects.</p>
+        <div class="toolbar"><button class="primary">Invite teammate</button></div>
+        <div class="grid">${['Ana Ruiz · Design', 'Ben Okafor · Engineering', 'Chen Wei · Product'].map((p) => `<div class="card"><h3>${p.split(' · ')[0]}</h3><p>${p.split(' · ')[1]}</p></div>`).join('')}</div>`;
+      return;
+    }
+    document.title = 'Plannr — Projects';
+    view.innerHTML = `<h1>Projects</h1><p class="lede">Plan the work, share it with your team.</p>
+      <div class="toolbar"><button class="primary" id="new">New project</button><button class="ghost">Import</button></div>
+      <div class="grid">${projects.map((p) => `<div class="card"><h3>${p.name}</h3><p>${p.tasks} tasks</p><span class="pill">${p.status}</span></div>`).join('')}</div>`;
+    document.getElementById('new').onclick = () => {
+      modal.classList.add('open');
+      document.getElementById('project-name').focus();
+    };
+  }
+
+  document.querySelectorAll('nav a').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      history.pushState({}, '', a.dataset.route);
+      render();
+    }),
+  );
+  window.addEventListener('popstate', render);
+  document.getElementById('cancel').onclick = () => modal.classList.remove('open');
+  document.getElementById('new-project').onsubmit = (e) => {
+    e.preventDefault();
+    const input = document.getElementById('project-name');
+    projects.unshift({name: input.value || 'Untitled', tasks: 0, status: 'New'});
+    input.value = '';
+    modal.classList.remove('open');
+    render();
+    const toast = document.getElementById('toast');
+    toast.textContent = 'Project created';
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  };
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>{{TITLE}}</title>
+<style>
+  :root { --primary: {{PRIMARY}}; --accent: {{ACCENT}}; --font: {{FONT}}; --ink: #14161f; }
+  #stage { font-family: var(--font); color: var(--ink);
+    background: radial-gradient(110% 90% at 0% 0%, color-mix(in srgb, var(--primary) 24%, #fff), transparent 60%),
+                radial-gradient(90% 90% at 100% 100%, color-mix(in srgb, var(--accent) 26%, #fff), transparent 60%), #f6f7fb; }
+  .copy { position: absolute; left: 0; right: 0; text-align: center; }
+  .headline { font-weight: 750; letter-spacing: -0.02em; }
+  .sub { color: #4a5068; margin-top: .35em; }
+  .frame { position: absolute; background: #fff; border-radius: 14px; overflow: hidden;
+    box-shadow: 0 30px 70px -30px rgba(20, 30, 80, .45), 0 0 0 1px rgba(20, 30, 80, .08); }
+  .placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #8790a8; font-weight: 600;
+    background: repeating-linear-gradient(135deg, #f2f4f9 0 14px, #e9ecf4 14px 28px); }
+  .callout { position: absolute; padding: .55em .9em; border-radius: 12px; background: var(--primary); color: #fff;
+    font-weight: 650; white-space: nowrap; box-shadow: 0 14px 30px -12px color-mix(in srgb, var(--primary) 70%, #000); }
+  .ring { position: absolute; border: 3px solid var(--primary); border-radius: 12px; }
+  .logo { position: absolute; height: 28px; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script type="application/json" id="scene-data">
+{
+  "headline": "{{TITLE}}",
+  "subline": "{{PITCH}}",
+  "image": "",
+  "media": {{MEDIA}},
+  "logo": "{{LOGO}}",
+  "focus": null,
+  "callout": "New",
+  "zoom": 1.6,
+  "loop": true
+}
+</script>
+<script type="module">
+  import {createScene, imageSize, fitBox} from '/__studio/runtime.js';
+
+  const data = JSON.parse(document.getElementById('scene-data').textContent);
+  const W = {{WIDTH}}, H = {{HEIGHT}};
+  const scene = createScene({width: W, height: H});
+  const portrait = H > W;
+  const unit = Math.min(W, H);
+
+  const src = data.image || data.media.find((m) => m !== data.logo && /\.(png|jpe?g|webp|gif|svg)$/i.test(m)) || '';
+  const size = src ? await imageSize(src) : {width: 1440, height: 900};
+
+  const copyHeight = Math.round(H * (portrait ? 0.24 : 0.2));
+  const copy = scene.el('div', {className: 'copy', style: {top: `${unit * 0.06}px`, padding: `0 ${unit * 0.06}px`}});
+  const headline = scene.el('div', {parent: copy, className: 'headline', text: data.headline, style: {fontSize: `${Math.round(unit * 0.065)}px`}});
+  const sub = data.subline ? scene.el('div', {parent: copy, className: 'sub', text: data.subline, style: {fontSize: `${Math.round(unit * 0.032)}px`}}) : null;
+
+  const margin = unit * 0.07;
+  const box = fitBox({width: W - margin * 2, height: H - copyHeight - margin * 1.5}, size.width / size.height);
+  const frame = scene.el('div', {className: 'frame', style: {width: `${box.width}px`, height: `${box.height}px`, left: `${(W - box.width) / 2}px`, top: `${copyHeight + (H - copyHeight - margin * 0.5 - box.height) / 2}px`}});
+  const camera = scene.camera(frame, {worldWidth: size.width, worldHeight: size.height, width: box.width, height: box.height});
+  if (src) scene.image(src, {parent: camera.world, style: {width: `${size.width}px`, height: `${size.height}px`}});
+  else scene.el('div', {parent: camera.world, className: 'placeholder', text: 'Add an image: gif-studio media add <asset> <file>', style: {fontSize: '40px'}});
+
+  if (data.logo) {
+    const logo = scene.image(data.logo, {style: {position: 'absolute', left: `${margin}px`, top: 'auto', bottom: `${margin * 0.4}px`, height: `${Math.round(unit * 0.05)}px`, width: 'auto'}});
+    scene.fadeIn(logo, 300, 400);
+  }
+
+  const focus = data.focus ?? {x: size.width * 0.3, y: size.height * 0.3, width: size.width * 0.4, height: size.height * 0.3};
+  if (!data.loop) {
+    scene.fadeIn(headline, 0, 450, {y: 14});
+    if (sub) scene.fadeIn(sub, 200, 450, {y: 10});
+    scene.fadeIn(frame, 350, 600, {y: 30});
+  }
+  scene.section('intro', 'Intro', 0, 1400);
+
+  camera.focus(1500, 1100, focus, {padding: 1.25, maxZoom: camera.fitZoom() * data.zoom});
+  scene.beat(2700, 'Focus');
+  const ring = scene.el('div', {parent: camera.world, className: 'ring', style: {left: `${focus.x}px`, top: `${focus.y}px`, width: `${focus.width}px`, height: `${focus.height}px`}});
+  scene.set(ring, 0, {opacity: 0});
+  scene.tween(ring, {at: 2500, dur: 350, from: {opacity: 0, scale: 1.08}, to: {opacity: 1, scale: 1}, ease: 'out'});
+  scene.section('focus', 'Zoom in', 1400, 2900);
+
+  if (data.callout) {
+    const callout = scene.el('div', {className: 'callout', text: data.callout, style: {fontSize: `${Math.round(unit * 0.034)}px`, left: `${W / 2}px`, translate: '-50% 0', top: `${copyHeight + box.height * 0.12}px`}});
+    scene.set(callout, 0, {opacity: 0});
+    scene.tween(callout, {at: 2900, dur: 450, from: {opacity: 0, scale: 0.7, y: 10}, to: {opacity: 1, scale: 1, y: 0}, ease: 'outBack'});
+    scene.tween(callout, {at: 5000, dur: 300, from: {opacity: 1}, to: {opacity: 0}});
+    scene.beat(3300, data.callout);
+  }
+  scene.section('callout', 'Callout', 2900, 5000);
+
+  scene.tween(ring, {at: 5000, dur: 300, from: {opacity: 1}, to: {opacity: 0}});
+  camera.fit(5100, 1000);
+  scene.section('outro', 'Zoom out', 5000, 6800);
+  scene.done({duration: 6800});
+</script>
+</body>
+</html>

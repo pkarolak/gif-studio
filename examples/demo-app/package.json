@@ -1,0 +1,9 @@
+{
+  "name": "plannr-demo",
+  "description": "Plannr is a tiny project planner used to demo gif-studio: create a project, add tasks, share it with your team.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs --port 4610"
+  }
+}

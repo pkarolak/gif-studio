@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>{{TITLE}}</title>
+<style>
+  :root { --primary: {{PRIMARY}}; --accent: {{ACCENT}}; --font: {{FONT}}; --ink: #14161f; }
+  #stage { font-family: var(--font); color: var(--ink); background: linear-gradient(160deg, color-mix(in srgb, var(--primary) 14%, #fff), #f7f8fc 60%); }
+  .visual { position: absolute; border-radius: 12px; overflow: hidden; background: #fff;
+    box-shadow: 0 24px 50px -28px rgba(20, 30, 80, .5), 0 0 0 1px rgba(20, 30, 80, .08); }
+  .visual img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+  .placeholder { position: absolute; inset: 0; display: grid; place-items: center; font-weight: 700; color: #fff; }
+  .label { position: absolute; display: flex; align-items: center; gap: .6em; font-weight: 650; white-space: nowrap; }
+  .pill { display: inline-grid; place-items: center; width: 1.8em; height: 1.8em; border-radius: 50%; background: var(--primary); color: #fff; font-size: .8em; }
+  .dots { position: absolute; display: flex; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 99px; background: rgba(20, 30, 80, .18); }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script type="application/json" id="scene-data">
+{
+  "stepDuration": 2600,
+  "steps": [
+    {"title": "Bring in what you've built", "image": ""},
+    {"title": "Review the full flow", "image": ""},
+    {"title": "Make changes in place", "image": ""},
+    {"title": "Send it back to build", "image": ""}
+  ],
+  "media": {{MEDIA}}
+}
+</script>
+<script type="module">
+  import {createScene} from '/__studio/runtime.js';
+
+  const data = JSON.parse(document.getElementById('scene-data').textContent);
+  const W = {{WIDTH}}, H = {{HEIGHT}};
+  const scene = createScene({width: W, height: H});
+  const unit = Math.min(W, H);
+  const pad = Math.round(unit * 0.07);
+  const labelHeight = Math.round(H * 0.16);
+  const images = data.media.filter((m) => /\.(png|jpe?g|webp|gif|svg)$/i.test(m) && !/logo|favicon|mark/i.test(m));
+  const palette = ['var(--primary)', 'var(--accent)', '#14b8a6', '#f97316', '#8b5cf6'];
+
+  const visual = scene.el('div', {className: 'visual', style: {left: `${pad}px`, top: `${pad}px`, width: `${W - pad * 2}px`, height: `${H - pad * 2 - labelHeight}px`}});
+  const dots = scene.el('div', {className: 'dots', style: {right: `${pad}px`, bottom: `${pad * 0.8}px`}});
+
+  let t = 0;
+  let previous;
+  data.steps.forEach((step, i) => {
+    const start = t;
+    const src = step.image || images[i % Math.max(images.length, 1)];
+    const layer = src
+      ? scene.el('img', {parent: visual})
+      : scene.el('div', {parent: visual, className: 'placeholder', text: `Step ${i + 1}`, style: {background: palette[i % palette.length], fontSize: `${unit * 0.08}px`}});
+    if (src) layer.src = src;
+    scene.set(layer, 0, {opacity: i === 0 ? 1 : 0});
+    if (i > 0) scene.crossfade(i > 1 ? previous : undefined, layer, start, 350);
+    if (i === data.steps.length - 1 && i > 0) scene.tween(layer, {at: start + data.stepDuration - 350, dur: 350, to: {opacity: 0}});
+    previous = layer;
+    scene.tween(layer, {at: start, dur: data.stepDuration, from: {scale: 1.04}, to: {scale: 1}, ease: 'out'});
+
+    const label = scene.el('div', {className: 'label', html: `<span class="pill">${i + 1}</span><span></span>`, style: {left: `${pad}px`, bottom: `${pad * 0.7}px`, fontSize: `${Math.round(unit * 0.05)}px`}});
+    scene.set(label, 0, {opacity: 0});
+    scene.tween(label, {at: start + 100, dur: 350, from: {opacity: 0, y: 12}, to: {opacity: 1, y: 0}, ease: 'out'});
+    scene.type(label.lastElementChild, {at: start + 250, text: step.title, cps: 30, caret: false});
+    scene.tween(label, {at: start + data.stepDuration - 250, dur: 250, from: {opacity: 1}, to: {opacity: 0}});
+
+    const dot = scene.el('div', {parent: dots, className: 'dot'});
+    scene.set(dot, 0, {opacity: 0.5, scaleX: 1});
+    scene.tween(dot, {at: start, dur: 250, to: {opacity: 1, scaleX: 2.2}});
+    scene.tween(dot, {at: start + data.stepDuration - 200, dur: 200, to: {opacity: 0.5, scaleX: 1}});
+
+    scene.beat(start + 1500, step.title);
+    t += data.stepDuration;
+    scene.section(`step-${i + 1}`, step.title, start, t);
+  });
+
+  scene.done({duration: t});
+</script>
+</body>
+</html>
